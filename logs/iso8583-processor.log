@@ -1,0 +1,101 @@
+2025-08-08 09:08:25 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Starting Iso8583EncodeDecodeTest using Java 21.0.2 with PID 71273 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 09:08:25 [main] DEBUG c.e.iso8583.Iso8583EncodeDecodeTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 09:08:25 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 09:08:26 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Started Iso8583EncodeDecodeTest in 1.099 seconds (process running for 1.861)
+2025-08-08 10:23:31 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Starting Iso8583MessageServiceTest using Java 21.0.2 with PID 180773 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:23:31 [main] DEBUG c.e.i.s.Iso8583MessageServiceTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:23:31 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:23:32 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Started Iso8583MessageServiceTest in 1.177 seconds (process running for 1.885)
+2025-08-08 10:23:33 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.iso8583.Iso8583EncodeDecodeTest]: Iso8583EncodeDecodeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-08 10:23:33 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.iso8583.Iso8583Application for test class com.example.iso8583.Iso8583EncodeDecodeTest
+2025-08-08 10:23:33 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Starting Iso8583EncodeDecodeTest using Java 21.0.2 with PID 180773 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:23:33 [main] DEBUG c.e.iso8583.Iso8583EncodeDecodeTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:23:33 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:23:33 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Started Iso8583EncodeDecodeTest in 0.156 seconds (process running for 2.795)
+2025-08-08 10:35:23 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Starting Iso8583MessageServiceTest using Java 21.0.2 with PID 198507 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:35:23 [main] DEBUG c.e.i.s.Iso8583MessageServiceTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:35:23 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:35:24 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Started Iso8583MessageServiceTest in 0.921 seconds (process running for 1.557)
+2025-08-08 10:35:25 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.iso8583.Iso8583EncodeDecodeTest]: Iso8583EncodeDecodeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-08 10:35:25 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.iso8583.Iso8583Application for test class com.example.iso8583.Iso8583EncodeDecodeTest
+2025-08-08 10:35:25 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Starting Iso8583EncodeDecodeTest using Java 21.0.2 with PID 198507 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:35:25 [main] DEBUG c.e.iso8583.Iso8583EncodeDecodeTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:35:25 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:35:25 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Started Iso8583EncodeDecodeTest in 0.16 seconds (process running for 2.423)
+2025-08-08 10:36:52 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Starting Iso8583MessageServiceTest using Java 21.0.2 with PID 200633 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:36:52 [main] DEBUG c.e.i.s.Iso8583MessageServiceTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:36:52 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:36:53 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Started Iso8583MessageServiceTest in 0.954 seconds (process running for 1.679)
+2025-08-08 10:36:54 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.iso8583.Iso8583EncodeDecodeTest]: Iso8583EncodeDecodeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-08 10:36:54 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.iso8583.Iso8583Application for test class com.example.iso8583.Iso8583EncodeDecodeTest
+2025-08-08 10:36:54 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Starting Iso8583EncodeDecodeTest using Java 21.0.2 with PID 200633 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:36:54 [main] DEBUG c.e.iso8583.Iso8583EncodeDecodeTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:36:54 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:36:54 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Started Iso8583EncodeDecodeTest in 0.165 seconds (process running for 2.514)
+2025-08-08 10:38:11 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Starting Iso8583MessageServiceTest using Java 21.0.2 with PID 202715 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:38:11 [main] DEBUG c.e.i.s.Iso8583MessageServiceTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:38:11 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:38:12 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Started Iso8583MessageServiceTest in 0.881 seconds (process running for 1.474)
+2025-08-08 10:38:13 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.iso8583.Iso8583EncodeDecodeTest]: Iso8583EncodeDecodeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-08 10:38:13 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.iso8583.Iso8583Application for test class com.example.iso8583.Iso8583EncodeDecodeTest
+2025-08-08 10:38:13 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Starting Iso8583EncodeDecodeTest using Java 21.0.2 with PID 202715 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:38:13 [main] DEBUG c.e.iso8583.Iso8583EncodeDecodeTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:38:13 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:38:13 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Started Iso8583EncodeDecodeTest in 0.165 seconds (process running for 2.34)
+2025-08-08 10:39:14 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Starting Iso8583MessageServiceTest using Java 21.0.2 with PID 204247 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:39:14 [main] DEBUG c.e.i.s.Iso8583MessageServiceTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:39:14 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:39:15 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Started Iso8583MessageServiceTest in 0.9 seconds (process running for 1.494)
+2025-08-08 10:39:15 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.iso8583.Iso8583EncodeDecodeTest]: Iso8583EncodeDecodeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-08 10:39:15 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.iso8583.Iso8583Application for test class com.example.iso8583.Iso8583EncodeDecodeTest
+2025-08-08 10:39:15 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Starting Iso8583EncodeDecodeTest using Java 21.0.2 with PID 204247 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:39:15 [main] DEBUG c.e.iso8583.Iso8583EncodeDecodeTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:39:15 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:39:16 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Started Iso8583EncodeDecodeTest in 0.166 seconds (process running for 2.325)
+2025-08-08 10:41:27 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Starting Iso8583MessageServiceTest using Java 21.0.2 with PID 207680 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:41:27 [main] DEBUG c.e.i.s.Iso8583MessageServiceTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:41:27 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:41:28 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Started Iso8583MessageServiceTest in 0.868 seconds (process running for 1.45)
+2025-08-08 10:41:28 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.iso8583.Iso8583EncodeDecodeTest]: Iso8583EncodeDecodeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-08 10:41:28 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.iso8583.Iso8583Application for test class com.example.iso8583.Iso8583EncodeDecodeTest
+2025-08-08 10:41:28 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Starting Iso8583EncodeDecodeTest using Java 21.0.2 with PID 207680 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:41:28 [main] DEBUG c.e.iso8583.Iso8583EncodeDecodeTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:41:28 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:41:29 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Started Iso8583EncodeDecodeTest in 0.165 seconds (process running for 2.267)
+2025-08-08 10:42:10 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Starting Iso8583MessageServiceTest using Java 21.0.2 with PID 208668 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:42:10 [main] DEBUG c.e.i.s.Iso8583MessageServiceTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:42:10 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:42:11 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Started Iso8583MessageServiceTest in 0.957 seconds (process running for 1.566)
+2025-08-08 10:42:12 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.iso8583.Iso8583EncodeDecodeTest]: Iso8583EncodeDecodeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-08 10:42:12 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.iso8583.Iso8583Application for test class com.example.iso8583.Iso8583EncodeDecodeTest
+2025-08-08 10:42:12 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Starting Iso8583EncodeDecodeTest using Java 21.0.2 with PID 208668 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:42:12 [main] DEBUG c.e.iso8583.Iso8583EncodeDecodeTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:42:12 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:42:12 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Started Iso8583EncodeDecodeTest in 0.183 seconds (process running for 2.443)
+2025-08-08 10:42:52 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Starting Iso8583MessageServiceTest using Java 21.0.2 with PID 209916 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:42:52 [main] DEBUG c.e.i.s.Iso8583MessageServiceTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:42:52 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:42:52 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Started Iso8583MessageServiceTest in 1.038 seconds (process running for 1.622)
+2025-08-08 10:42:53 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.iso8583.Iso8583EncodeDecodeTest]: Iso8583EncodeDecodeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-08 10:42:53 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.iso8583.Iso8583Application for test class com.example.iso8583.Iso8583EncodeDecodeTest
+2025-08-08 10:42:53 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Starting Iso8583EncodeDecodeTest using Java 21.0.2 with PID 209916 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:42:53 [main] DEBUG c.e.iso8583.Iso8583EncodeDecodeTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:42:53 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:42:53 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Started Iso8583EncodeDecodeTest in 0.171 seconds (process running for 2.507)
+2025-08-08 10:44:32 [main] INFO  c.example.iso8583.Iso8583Application - Starting Iso8583Application using Java 21.0.2 with PID 212276 (/home/actdigital/repository/pocs/iso8583-annotation-processor/target/classes started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 10:44:32 [main] DEBUG c.example.iso8583.Iso8583Application - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 10:44:32 [main] INFO  c.example.iso8583.Iso8583Application - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 10:44:33 [main] INFO  o.s.b.w.e.netty.NettyWebServer - Netty started on port 8080 (http)
+2025-08-08 10:44:33 [main] INFO  c.example.iso8583.Iso8583Application - Started Iso8583Application in 1.102 seconds (process running for 1.832)
+2025-08-08 10:50:26 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.netty.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-08-08 10:50:26 [netty-shutdown] INFO  o.s.b.w.e.netty.GracefulShutdown - Graceful shutdown complete
+2025-08-08 11:13:27 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Starting Iso8583MessageServiceTest using Java 21.0.2 with PID 255443 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 11:13:27 [main] DEBUG c.e.i.s.Iso8583MessageServiceTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 11:13:27 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 11:13:28 [main] INFO  c.e.i.s.Iso8583MessageServiceTest - Started Iso8583MessageServiceTest in 1.162 seconds (process running for 2.097)
+2025-08-08 11:13:29 [main] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.iso8583.Iso8583EncodeDecodeTest]: Iso8583EncodeDecodeTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-08-08 11:13:29 [main] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.iso8583.Iso8583Application for test class com.example.iso8583.Iso8583EncodeDecodeTest
+2025-08-08 11:13:29 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Starting Iso8583EncodeDecodeTest using Java 21.0.2 with PID 255443 (started by actdigital in /home/actdigital/repository/pocs/iso8583-annotation-processor)
+2025-08-08 11:13:29 [main] DEBUG c.e.iso8583.Iso8583EncodeDecodeTest - Running with Spring Boot v3.5.4, Spring v6.2.9
+2025-08-08 11:13:29 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - No active profile set, falling back to 1 default profile: "default"
+2025-08-08 11:13:29 [main] INFO  c.e.iso8583.Iso8583EncodeDecodeTest - Started Iso8583EncodeDecodeTest in 0.168 seconds (process running for 3.064)
