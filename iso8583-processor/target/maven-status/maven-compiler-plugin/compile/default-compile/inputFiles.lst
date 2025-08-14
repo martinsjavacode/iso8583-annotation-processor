@@ -1,0 +1,9 @@
+/home/actdigital/repository/martinsjavacode/iso8583-annotation-processor/iso8583-processor/src/main/java/com/example/iso8583/annotation/Iso8583Field.java
+/home/actdigital/repository/martinsjavacode/iso8583-annotation-processor/iso8583-processor/src/main/java/com/example/iso8583/annotation/Iso8583Message.java
+/home/actdigital/repository/martinsjavacode/iso8583-annotation-processor/iso8583-processor/src/main/java/com/example/iso8583/contract/EncoderRegistry.java
+/home/actdigital/repository/martinsjavacode/iso8583-annotation-processor/iso8583-processor/src/main/java/com/example/iso8583/contract/IsoMessageDecoder.java
+/home/actdigital/repository/martinsjavacode/iso8583-annotation-processor/iso8583-processor/src/main/java/com/example/iso8583/contract/IsoMessageEncoder.java
+/home/actdigital/repository/martinsjavacode/iso8583-annotation-processor/iso8583-processor/src/main/java/com/example/iso8583/processor/Iso8583AnnotationProcessor.java
+/home/actdigital/repository/martinsjavacode/iso8583-annotation-processor/iso8583-processor/src/main/java/com/example/iso8583/processor/meta/FieldMeta.java
+/home/actdigital/repository/martinsjavacode/iso8583-annotation-processor/iso8583-processor/src/main/java/com/example/iso8583/processor/meta/MessageMeta.java
+/home/actdigital/repository/martinsjavacode/iso8583-annotation-processor/iso8583-processor/src/main/java/com/example/iso8583/utils/Iso8583Utils.java
