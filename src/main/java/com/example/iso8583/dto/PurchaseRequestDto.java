@@ -12,16 +12,11 @@ import java.time.LocalDateTime;
  * Esta classe será processada pelo Annotation Processor para gerar
  * automaticamente um parser/builder de mensagens ISO 8583.
  */
-@Iso8583Message(
-    version = 0, // ISO 8583-1987
-    clazz = 2,   // Authorization
-    function = 0, // Request
-    source = 0   // Acquirer
-)
+@Iso8583Message(mti = 0x200)
 public class PurchaseRequestDto {
 
     @Iso8583Field(
-        field = 2,
+        number = 2,
         length = 19,
         type = IsoType.NUMERIC,
         required = true,
@@ -30,7 +25,7 @@ public class PurchaseRequestDto {
     private String primaryAccountNumber;
 
     @Iso8583Field(
-        field = 3,
+        number = 3,
         length = 6,
         type = IsoType.NUMERIC,
         required = true,
@@ -39,7 +34,7 @@ public class PurchaseRequestDto {
     private String processingCode;
 
     @Iso8583Field(
-        field = 4,
+        number = 4,
         length = 12,
         type = IsoType.AMOUNT,
         required = true,
@@ -48,7 +43,7 @@ public class PurchaseRequestDto {
     private BigDecimal transactionAmount;
 
     @Iso8583Field(
-        field = 7,
+        number = 7,
         length = 10,
         type = IsoType.DATE10,
         required = true,
@@ -57,7 +52,7 @@ public class PurchaseRequestDto {
     private LocalDateTime transmissionDateTime;
 
     @Iso8583Field(
-        field = 11,
+        number = 11,
         length = 6,
         type = IsoType.NUMERIC,
         required = true,
@@ -66,7 +61,7 @@ public class PurchaseRequestDto {
     private String systemTraceAuditNumber;
 
     @Iso8583Field(
-        field = 12,
+        number = 12,
         length = 6,
         type = IsoType.TIME,
         required = true,
@@ -75,7 +70,7 @@ public class PurchaseRequestDto {
     private LocalDateTime localTransactionTime;
 
     @Iso8583Field(
-        field = 13,
+        number = 13,
         length = 4,
         type = IsoType.DATE4,
         required = true,
@@ -84,7 +79,7 @@ public class PurchaseRequestDto {
     private LocalDateTime localTransactionDate;
 
     @Iso8583Field(
-        field = 18,
+        number = 18,
         length = 4,
         type = IsoType.NUMERIC,
         required = false,
@@ -93,7 +88,7 @@ public class PurchaseRequestDto {
     private String merchantCategoryCode;
 
     @Iso8583Field(
-        field = 22,
+        number = 22,
         length = 3,
         type = IsoType.NUMERIC,
         required = true,
@@ -102,7 +97,7 @@ public class PurchaseRequestDto {
     private String posEntryMode;
 
     @Iso8583Field(
-        field = 25,
+        number = 25,
         length = 2,
         type = IsoType.NUMERIC,
         required = true,
@@ -111,7 +106,7 @@ public class PurchaseRequestDto {
     private String posConditionCode;
 
     @Iso8583Field(
-        field = 32,
+        number = 32,
         length = 11,
         type = IsoType.LLVAR,
         required = false,
@@ -120,7 +115,7 @@ public class PurchaseRequestDto {
     private String acquiringInstitutionId;
 
     @Iso8583Field(
-        field = 37,
+        number = 37,
         length = 12,
         type = IsoType.ALPHA,
         required = true,
@@ -129,7 +124,7 @@ public class PurchaseRequestDto {
     private String retrievalReferenceNumber;
 
     @Iso8583Field(
-        field = 41,
+        number = 41,
         length = 8,
         type = IsoType.ALPHA,
         required = true,
@@ -138,7 +133,7 @@ public class PurchaseRequestDto {
     private String terminalId;
 
     @Iso8583Field(
-        field = 42,
+        number = 42,
         length = 15,
         type = IsoType.ALPHA,
         required = true,
@@ -147,7 +142,7 @@ public class PurchaseRequestDto {
     private String merchantId;
 
     @Iso8583Field(
-        field = 49,
+        number = 49,
         length = 3,
         type = IsoType.NUMERIC,
         required = true,

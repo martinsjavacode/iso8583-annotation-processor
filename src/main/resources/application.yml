@@ -15,8 +15,6 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/iso8583-processor.log
 
 management:
   endpoints:
@@ -30,7 +28,6 @@ management:
 # Configurações específicas da aplicação
 app:
   iso8583:
-    # Configuração totalmente programática - sem XML
     assign-date: true
     encoding: "UTF-8"
     use-binary-messages: false

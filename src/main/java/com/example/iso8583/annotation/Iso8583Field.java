@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Anotação para marcar um campo como um field ISO 8583.
+ * Anotação para marcar um campo como um number ISO 8583.
  * Similar ao @Column do JPA, define as propriedades do campo.
  */
 @Target(ElementType.FIELD)
@@ -18,7 +18,7 @@ public @interface Iso8583Field {
     /**
      * Número do campo ISO 8583 (1-128)
      */
-    int field();
+    int number();
     
     /**
      * Comprimento do campo

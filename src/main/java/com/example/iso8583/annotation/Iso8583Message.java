@@ -13,22 +13,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE) // Processada em tempo de compilação
 public @interface Iso8583Message {
 	/**
-	 * Versão da mensagem ISO 8583
+	 * MTI (Message Type Indicator) da mensagem ISO 8583
+	 * O MTI eh composto por 4 digitos
+	 * - 1º digito: versao da ISO (0-3)
+	 * - 2º digito: classe da mensagem (0-9)
+	 * - 3º digito: funcao da mensagem (0-9)
+	 * - 4º digito: origem da mensagem (0-9)
 	 */
-	int version() default 0;
-
-	/**
-	 * Classe de mensagem ISO 8583.
-	 */
-	int clazz();
-    
-    /**
-     * Função da mensagem ISO 8583.
-     */
-    int function();
-    
-    /**
-     * Origem da mensagem ISO 8583.
-     */
-    int source();
+	int mti();
 }
