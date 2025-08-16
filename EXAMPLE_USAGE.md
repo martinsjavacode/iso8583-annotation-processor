@@ -46,7 +46,7 @@ public class PurchaseExample {
         purchase.setMerchantId("MERCHANT000001");
         
         // 2. Obter o encoder gerado automaticamente
-        GeneratedIso8583Registry registry = new GeneratedIso8583Registry();
+        Iso8583Registry registry = new GeneratedIso8583Registry();
         IsoMessageEncoder<PurchaseRequestDto> encoder = registry.getEncoder(PurchaseRequestDto.class);
         
         // 3. Codificar para bytes ISO 8583

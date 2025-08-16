@@ -20,5 +20,5 @@ public @interface Iso8583Message {
 	 * - 3º digito: funcao da mensagem (0-9)
 	 * - 4º digito: origem da mensagem (0-9)
 	 */
-	int mti();
+	String mti();
 }

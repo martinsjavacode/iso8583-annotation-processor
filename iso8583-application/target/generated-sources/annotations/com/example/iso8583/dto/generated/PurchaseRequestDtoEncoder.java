@@ -6,6 +6,7 @@ import com.example.iso8583.dto.PurchaseRequestDto;
 import com.example.iso8583.enums.IsoType;
 import com.example.iso8583.service.IsoEncoder;
 import com.example.iso8583.service.IsoMessageFactory;
+import java.util.BitSet;
 
 /**
  * Encoder gerado automaticamente para PurchaseRequestDto.
@@ -59,12 +60,37 @@ public final class PurchaseRequestDtoEncoder implements IsoMessageEncoder<Purcha
   }
 
   /**
+   * Cria o bitmap da ISO 8583
+   */
+  @Override
+  public BitSet isoBitSetGenerator() {
+    final BitSet bits = new BitSet();
+    bits.set(2);
+    bits.set(3);
+    bits.set(4);
+    bits.set(7);
+    bits.set(11);
+    bits.set(12);
+    bits.set(13);
+    bits.set(18);
+    bits.set(22);
+    bits.set(25);
+    bits.set(32);
+    bits.set(37);
+    bits.set(41);
+    bits.set(42);
+    bits.set(49);
+    return bits;
+  }
+
+  /**
    * Converte DTO em IsoMessage
    */
   @Override
   public IsoMessage toIsoMessage(PurchaseRequestDto dto) {
     validateRequirements(dto);
-    IsoMessage message = new IsoMessage(512);
+    IsoMessage message = new IsoMessage("0210");
+    message.setBitmap(isoBitSetGenerator());
     message.setField(2, dto.getPrimaryAccountNumber(), IsoType.LLVAR, 0);
     message.setField(3, dto.getProcessingCode(), IsoType.NUMERIC, 6);
     message.setField(4, dto.getTransactionAmount(), IsoType.AMOUNT, 12);

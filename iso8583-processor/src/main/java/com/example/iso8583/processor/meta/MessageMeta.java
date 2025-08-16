@@ -10,5 +10,5 @@ import java.util.List;
  * @param packageName do DTO
  * @param simpleName  ex: PurchaseRequestDto
  */
-public record MessageMeta(TypeElement type, int mti, List<FieldMeta> fields, String packageName, String simpleName) {
+public record MessageMeta(TypeElement type, String mti, List<FieldMeta> fields, String packageName, String simpleName) {
 }

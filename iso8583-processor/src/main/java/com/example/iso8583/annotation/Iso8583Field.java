@@ -14,29 +14,29 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE) // Processada em tempo de compilação
 public @interface Iso8583Field {
-    
-    /**
-     * Número do campo ISO 8583 (2-128)
-     */
-    int number();
-    
-    /**
-     * Comprimento do campo (obrigatório para tipos de tamanho fixo)
-     */
-    int length() default 0;
-    
-    /**
-     * Tipo de dados do campo
-     */
-    IsoType type();
-    
-    /**
-     * Se o campo é obrigatório
-     */
-    boolean required() default false;
-    
-    /**
-     * Descrição do campo (para documentação)
-     */
-    String description() default "";
+
+	/**
+	 * Número do campo ISO 8583 (2-128)
+	 */
+	int number();
+
+	/**
+	 * Comprimento do campo (obrigatório para tipos de tamanho fixo)
+	 */
+	int length() default 0;
+
+	/**
+	 * Tipo de dados do campo
+	 */
+	IsoType type();
+
+	/**
+	 * Se o campo é obrigatório
+	 */
+	boolean required() default false;
+
+	/**
+	 * Descrição do campo (para documentação)
+	 */
+	String description() default "";
 }

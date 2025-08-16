@@ -13,16 +13,13 @@ import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static javax.tools.Diagnostic.Kind;
 
 /**
  * Processador de anotações que gera encoders e decoders para mensagens ISO 8583.
- * 
+ * <p>
  * Para cada classe anotada com @Iso8583Message, gera:
  * 1. Um encoder que converte DTO -> IsoMessage/bytes
  * 2. Um decoder que converte IsoMessage/bytes -> DTO
@@ -30,421 +27,464 @@ import static javax.tools.Diagnostic.Kind;
  */
 @AutoService(Processor.class)
 @SupportedAnnotationTypes({
-    "com.example.iso8583.annotation.Iso8583Message", 
-    "com.example.iso8583.annotation.Iso8583Field"
+	"com.example.iso8583.annotation.Iso8583Message",
+	"com.example.iso8583.annotation.Iso8583Field"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
 public class Iso8583AnnotationProcessor extends AbstractProcessor {
-    
-    private Elements elementUtils;
-    private Types typeUtils;
-    private Filer filer;
-    private Messager messager;
-    private final List<MessageMeta> collectedMessages = new ArrayList<>();
 
-    @Override
-    public synchronized void init(ProcessingEnvironment processingEnv) {
-        super.init(processingEnv);
-        this.elementUtils = processingEnv.getElementUtils();
-        this.typeUtils = processingEnv.getTypeUtils();
-        this.filer = processingEnv.getFiler();
-        this.messager = processingEnv.getMessager();
+	private final List<MessageMeta> collectedMessages = new ArrayList<>();
+	private Elements elementUtils;
+	private Types typeUtils;
+	private Filer filer;
+	private Messager messager;
 
-        this.messager.printMessage(Kind.NOTE, "ISO 8583 Annotation Processor started...");
-    }
+	private static String capitalize(String s) {
+		if (s == null || s.isEmpty()) {
+			return s;
+		}
+		return s.substring(0, 1).toUpperCase() + s.substring(1);
+	}
 
-    @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        if (roundEnv.processingOver()) {
-            if (!collectedMessages.isEmpty()) {
-                generateRegistry();
-            }
-            return true;
-        }
+	@Override
+	public synchronized void init(ProcessingEnvironment processingEnv) {
+		super.init(processingEnv);
+		this.elementUtils = processingEnv.getElementUtils();
+		this.typeUtils = processingEnv.getTypeUtils();
+		this.filer = processingEnv.getFiler();
+		this.messager = processingEnv.getMessager();
 
-        for (Element element : roundEnv.getElementsAnnotatedWith(Iso8583Message.class)) {
-            if (element.getKind() != ElementKind.CLASS) {
-                messager.printMessage(Kind.ERROR, 
-                    "Annotation @Iso8583Message can only be applied to a class", element);
-                continue;
-            }
+		this.messager.printMessage(Kind.NOTE, "ISO 8583 Annotation Processor started...");
+	}
 
-            TypeElement dtoType = (TypeElement) element;
-            processMessageClass(dtoType);
-        }
+	@Override
+	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+		if (roundEnv.processingOver()) {
+			if (!collectedMessages.isEmpty()) {
+				generateRegistry();
+			}
+			return true;
+		}
 
-        return true;
-    }
+		for (Element element : roundEnv.getElementsAnnotatedWith(Iso8583Message.class)) {
+			if (element.getKind() != ElementKind.CLASS) {
+				messager.printMessage(Kind.ERROR,
+					"Annotation @Iso8583Message can only be applied to a class", element);
+				continue;
+			}
 
-    private void processMessageClass(TypeElement dtoType) {
-        Iso8583Message iso8583Message = dtoType.getAnnotation(Iso8583Message.class);
-        int mti = iso8583Message.mti();
+			TypeElement dtoType = (TypeElement) element;
+			processMessageClass(dtoType);
+		}
 
-        List<FieldMeta> fields = new ArrayList<>();
-        for (Element enclosed : dtoType.getEnclosedElements()) {
-            if (enclosed.getKind() == ElementKind.FIELD) {
-                VariableElement varElement = (VariableElement) enclosed;
-                Iso8583Field iso8583Field = varElement.getAnnotation(Iso8583Field.class);
-                
-                if (iso8583Field != null) {
-                    String propName = varElement.getSimpleName().toString();
-                    int length = iso8583Field.length();
-                    
-                    // Para tipos que têm comprimento fixo, usa o comprimento do tipo se não especificado
-                    if (length == 0 && iso8583Field.type().getFixedLength() > 0) {
-                        length = iso8583Field.type().getFixedLength();
-                    }
-                    
-                    fields.add(new FieldMeta(
-                        varElement,
-                        iso8583Field.number(),
-                        iso8583Field.type(),
-                        length,
-                        iso8583Field.required(),
-                        propName
-                    ));
-                }
-            }
-        }
+		return true;
+	}
 
-        MessageMeta messageMeta = new MessageMeta(
-            dtoType,
-            mti,
-            fields,
-            elementUtils.getPackageOf(dtoType).getQualifiedName().toString(),
-            dtoType.getSimpleName().toString()
-        );
+	private void processMessageClass(TypeElement dtoType) {
+		Iso8583Message iso8583Message = dtoType.getAnnotation(Iso8583Message.class);
+		String mti = iso8583Message.mti();
 
-        validate(messageMeta);
-        generateEncoder(messageMeta);
-        generateDecoder(messageMeta);
-        collectedMessages.add(messageMeta);
-    }
+		List<FieldMeta> fields = new ArrayList<>();
+		for (Element enclosed : dtoType.getEnclosedElements()) {
+			if (enclosed.getKind() == ElementKind.FIELD) {
+				VariableElement varElement = (VariableElement) enclosed;
+				Iso8583Field iso8583Field = varElement.getAnnotation(Iso8583Field.class);
 
-    private void validate(MessageMeta meta) {
-        Set<Integer> seen = new HashSet<>();
-        
-        for (FieldMeta f : meta.fields()) {
-            // Valida número do campo
-            if (f.number() < 2 || f.number() > 128) {
-                messager.printMessage(Kind.ERROR,
-                    "Field number must be between 2-128, got: " + f.number(),
-                    f.element());
-            }
+				if (iso8583Field != null) {
+					String propName = varElement.getSimpleName().toString();
+					int length = iso8583Field.length();
 
-            // Valida duplicidade
-            if (!seen.add(f.number())) {
-                messager.printMessage(Kind.ERROR,
-                    "Duplicate field number: " + f.number(),
-                    f.element());
-            }
+					// Para tipos que têm comprimento fixo, usa o comprimento do tipo se não especificado
+					if (length == 0 && iso8583Field.type().getFixedLength() > 0) {
+						length = iso8583Field.type().getFixedLength();
+					}
 
-            // Valida comprimento para tipos que precisam
-            if (f.type().needsLength() && f.length() <= 0) {
-                messager.printMessage(Kind.ERROR,
-                    "Type " + f.type().name() + " requires length > 0",
-                    f.element());
-            }
-        }
-    }
+					fields.add(new FieldMeta(
+						varElement,
+						iso8583Field.number(),
+						iso8583Field.type(),
+						length,
+						iso8583Field.required(),
+						propName
+					));
+				}
+			}
+		}
 
-    private void generateEncoder(MessageMeta meta) {
-        ClassName dto = ClassName.get(meta.packageName(), meta.simpleName());
-        String generatedPkg = meta.packageName() + ".generated";
-        String encoderName = meta.simpleName() + "Encoder";
+		MessageMeta messageMeta = new MessageMeta(
+			dtoType,
+			mti,
+			fields,
+			elementUtils.getPackageOf(dtoType).getQualifiedName().toString(),
+			dtoType.getSimpleName().toString()
+		);
 
-        // Imports necessários
-        ClassName isoMessage = ClassName.get("com.example.iso8583.domain", "IsoMessage");
-        ClassName isoValue = ClassName.get("com.example.iso8583.domain", "IsoValue");
-        ClassName isoType = ClassName.get("com.example.iso8583.enums", "IsoType");
-        ClassName isoEncoder = ClassName.get("com.example.iso8583.service", "IsoEncoder");
-        ClassName isoMessageFactory = ClassName.get("com.example.iso8583.service", "IsoMessageFactory");
-        ClassName isoMessageEncoder = ClassName.get("com.example.iso8583.contract", "IsoMessageEncoder");
+		validate(messageMeta);
+		generateEncoder(messageMeta);
+		generateDecoder(messageMeta);
+		collectedMessages.add(messageMeta);
+	}
 
-        // Método de validação
-        MethodSpec.Builder validateMethod = MethodSpec.methodBuilder("validateRequirements")
-            .addModifiers(Modifier.PRIVATE)
-            .returns(dto)
-            .addParameter(dto, "dto")
-            .addJavadoc("Valida campos obrigatórios");
+	private void validate(MessageMeta meta) {
+		Set<Integer> seen = new HashSet<>();
 
-        for (FieldMeta f : meta.fields()) {
-            if (f.required()) {
-                validateMethod.beginControlFlow("if (dto.get$L() == null)", capitalize(f.propertyName()))
-                    .addStatement("throw new IllegalArgumentException(\"Field $L (DE $L) is required\")", 
-                        f.propertyName(), f.number())
-                    .endControlFlow();
-            }
-        }
-        validateMethod.addStatement("return dto");
+		for (FieldMeta f : meta.fields()) {
+			// Valida número do campo
+			if (f.number() < 2 || f.number() > 128) {
+				messager.printMessage(Kind.ERROR,
+					"Field number must be between 2-128, got: " + f.number(),
+					f.element());
+			}
 
-        // Método toIsoMessage
-        MethodSpec.Builder toIsoMessageMethod = MethodSpec.methodBuilder("toIsoMessage")
-            .addAnnotation(Override.class)
-            .addModifiers(Modifier.PUBLIC)
-            .returns(isoMessage)
-            .addParameter(dto, "dto")
-            .addJavadoc("Converte DTO em IsoMessage")
-            .addStatement("validateRequirements(dto)")
-            .addStatement("$T message = new $T($L)", isoMessage, isoMessage, meta.mti());
+			// Valida duplicidade
+			if (!seen.add(f.number())) {
+				messager.printMessage(Kind.ERROR,
+					"Duplicate field number: " + f.number(),
+					f.element());
+			}
 
-        // Adiciona cada campo à mensagem
-        for (FieldMeta f : meta.fields()) {
-            String getter = "get" + capitalize(f.propertyName()) + "()";
-            toIsoMessageMethod.addStatement(
-                "message.setField($L, dto.$L, $T.$L, $L)",
-                f.number(), getter, isoType, f.type().name(), f.length()
-            );
-        }
+			// Valida comprimento para tipos que precisam
+			if (f.type().needsLength() && f.length() <= 0) {
+				messager.printMessage(Kind.ERROR,
+					"Type " + f.type().name() + " requires length > 0",
+					f.element());
+			}
+		}
+	}
 
-        toIsoMessageMethod.addStatement("return message");
+	private void generateEncoder(MessageMeta meta) {
+		ClassName dto = ClassName.get(meta.packageName(), meta.simpleName());
+		String generatedPkg = meta.packageName() + ".generated";
+		String encoderName = meta.simpleName() + "Encoder";
 
-        // Método encode simples
-        MethodSpec encodeSimple = MethodSpec.methodBuilder("encode")
-            .addAnnotation(Override.class)
-            .addModifiers(Modifier.PUBLIC)
-            .returns(ArrayTypeName.of(TypeName.BYTE))
-            .addParameter(dto, "dto")
-            .addJavadoc("Codifica DTO em bytes ISO 8583")
-            .addStatement("$T message = toIsoMessage(dto)", isoMessage)
-            .addStatement("$T encoder = new $T()", isoEncoder, isoEncoder)
-            .addStatement("return encoder.encode(message)")
-            .build();
+		// Imports necessários
+		ClassName isoMessage = ClassName.get("com.example.iso8583.domain", "IsoMessage");
+		ClassName isoType = ClassName.get("com.example.iso8583.enums", "IsoType");
+		ClassName isoEncoder = ClassName.get("com.example.iso8583.service", "IsoEncoder");
+		ClassName isoMessageFactory = ClassName.get("com.example.iso8583.service", "IsoMessageFactory");
+		ClassName isoMessageEncoder = ClassName.get("com.example.iso8583.contract", "IsoMessageEncoder");
 
-        // Método encode com factory
-        MethodSpec encodeWithFactory = MethodSpec.methodBuilder("encode")
-            .addAnnotation(Override.class)
-            .addModifiers(Modifier.PUBLIC)
-            .returns(ArrayTypeName.of(TypeName.BYTE))
-            .addParameter(dto, "dto")
-            .addParameter(isoMessageFactory, "factory")
-            .addJavadoc("Codifica DTO em bytes ISO 8583 usando factory específica")
-            .addStatement("$T message = toIsoMessage(dto)", isoMessage)
-            .addStatement("return factory.encode(message)")
-            .build();
+		// Metodo de validação
+		MethodSpec.Builder validateMethod = MethodSpec.methodBuilder("validateRequirements")
+			.addModifiers(Modifier.PRIVATE)
+			.returns(dto)
+			.addParameter(dto, "dto")
+			.addJavadoc("Valida campos obrigatórios");
 
-        // Classe do encoder
-        TypeSpec encoder = TypeSpec.classBuilder(encoderName)
-            .addJavadoc("Encoder gerado automaticamente para $L.\nNão edite este arquivo.", meta.simpleName())
-            .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            .addSuperinterface(ParameterizedTypeName.get(isoMessageEncoder, dto))
-            .addMethod(validateMethod.build())
-            .addMethod(toIsoMessageMethod.build())
-            .addMethod(encodeSimple)
-            .addMethod(encodeWithFactory)
-            .build();
+		for (FieldMeta f : meta.fields()) {
+			if (f.required()) {
+				validateMethod.beginControlFlow("if (dto.get$L() == null)", capitalize(f.propertyName()))
+					.addStatement("throw new IllegalArgumentException(\"Field $L (DE $L) is required\")",
+						f.propertyName(), f.number())
+					.endControlFlow();
+			}
+		}
+		validateMethod.addStatement("return dto");
 
-        writeJavaFile(generatedPkg, encoder);
-    }
+		// Metodo isoBitSetGenerator
+		MethodSpec.Builder isoBitSetGeneratorMethod = MethodSpec.methodBuilder("isoBitSetGenerator")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.returns(BitSet.class)
+			.addJavadoc("Cria o bitmap da ISO 8583")
+			.addStatement("final BitSet bits = new BitSet()");
 
-    private void generateDecoder(MessageMeta meta) {
-        ClassName dto = ClassName.get(meta.packageName(), meta.simpleName());
-        String generatedPkg = meta.packageName() + ".generated";
-        String decoderName = meta.simpleName() + "Decoder";
+		// Adiciona os campos ao bitmap
+		for (FieldMeta f : meta.fields()) {
+			isoBitSetGeneratorMethod.addStatement("bits.set($L)", f.number());
+		}
 
-        // Imports necessários
-        ClassName isoMessage = ClassName.get("com.example.iso8583.domain", "IsoMessage");
-        ClassName isoValue = ClassName.get("com.example.iso8583.domain", "IsoValue");
-        ClassName isoDecoder = ClassName.get("com.example.iso8583.service", "IsoDecoder");
-        ClassName isoMessageFactory = ClassName.get("com.example.iso8583.service", "IsoMessageFactory");
-        ClassName isoMessageDecoder = ClassName.get("com.example.iso8583.contract", "IsoMessageDecoder");
-        ClassName fieldTemplate = ClassName.get("com.example.iso8583.service", "IsoDecoder", "FieldTemplate");
-        ClassName isoType = ClassName.get("com.example.iso8583.enums", "IsoType");
-        ClassName map = ClassName.get("java.util", "Map");
-        ClassName hashMap = ClassName.get("java.util", "HashMap");
+		isoBitSetGeneratorMethod.addStatement("return bits");
 
-        // Método para criar template de campos
-        MethodSpec.Builder createTemplateMethod = MethodSpec.methodBuilder("createFieldTemplate")
-            .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
-            .returns(ParameterizedTypeName.get(map, TypeName.get(Integer.class), fieldTemplate))
-            .addJavadoc("Cria template de campos para decodificação");
+		// Metodo toIsoMessage
+		MethodSpec.Builder toIsoMessageMethod = MethodSpec.methodBuilder("toIsoMessage")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.returns(isoMessage)
+			.addParameter(dto, "dto")
+			.addJavadoc("Converte DTO em IsoMessage")
+			.addStatement("validateRequirements(dto)")
+			.addStatement("$T message = new $T($S)", isoMessage, isoMessage, meta.mti())
+			.addStatement("message.setBitmap(isoBitSetGenerator())");
 
-        createTemplateMethod.addStatement("$T<Integer, $T> template = new $T<>()", 
-            map, fieldTemplate, hashMap);
+		// Adiciona cada campo à mensagem
+		for (FieldMeta f : meta.fields()) {
+			String getter = "get" + capitalize(f.propertyName()) + "()";
+			toIsoMessageMethod.addStatement(
+				"message.setField($L, dto.$L, $T.$L, $L)",
+				f.number(), getter, isoType, f.type().name(), f.length()
+			);
+		}
 
-        for (FieldMeta f : meta.fields()) {
-            createTemplateMethod.addStatement("template.put($L, new $T($T.$L, $L))",
-                f.number(), fieldTemplate, isoType, f.type().name(), f.length());
-        }
+		toIsoMessageMethod.addStatement("return message");
 
-        createTemplateMethod.addStatement("return template");
+		// Metodo encode
+		MethodSpec encodeMethod = MethodSpec.methodBuilder("encode")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.returns(ArrayTypeName.of(TypeName.BYTE))
+			.addParameter(dto, "dto")
+			.addJavadoc("Codifica DTO em bytes ISO 8583")
+			.addStatement("$T message = toIsoMessage(dto)", isoMessage)
+			.addStatement("$T encoder = new $T()", isoEncoder, isoEncoder)
+			.addStatement("return encoder.encode(message)")
+			.build();
 
-        // Método fromIsoMessage
-        MethodSpec.Builder fromIsoMessageMethod = MethodSpec.methodBuilder("fromIsoMessage")
-            .addAnnotation(Override.class)
-            .addModifiers(Modifier.PUBLIC)
-            .returns(dto)
-            .addParameter(isoMessage, "isoMessage")
-            .addJavadoc("Converte IsoMessage em DTO")
-            .addStatement("$T result = new $T()", dto, dto);
+		// Metodo encode com factory
+		MethodSpec encodeWithFactoryMethod = MethodSpec.methodBuilder("encode")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.returns(ArrayTypeName.of(TypeName.BYTE))
+			.addParameter(dto, "dto")
+			.addParameter(isoMessageFactory, "factory")
+			.addJavadoc("Codifica DTO em bytes ISO 8583 usando factory específica")
+			.addStatement("$T message = toIsoMessage(dto)", isoMessage)
+			.addStatement("return factory.encode(message)")
+			.build();
 
-        // Extrai cada campo da mensagem
-        for (FieldMeta f : meta.fields()) {
-            String setter = "set" + capitalize(f.propertyName());
-            fromIsoMessageMethod.addStatement("$T<?> field$L = isoMessage.getField($L)", 
-                isoValue, f.number(), f.number());
-            fromIsoMessageMethod.beginControlFlow("if (field$L != null)", f.number());
-            
-            // Conversão baseada no tipo do campo no DTO
-            String javaType = f.element().asType().toString();
-            if (javaType.contains("String")) {
-                fromIsoMessageMethod.addStatement("result.$L(field$L.value().toString())", 
-                    setter, f.number());
-            } else if (javaType.contains("BigDecimal")) {
-                fromIsoMessageMethod.addStatement("result.$L(new java.math.BigDecimal(field$L.value().toString()))", 
-                    setter, f.number());
-            } else if (javaType.contains("LocalDateTime")) {
-                fromIsoMessageMethod.addStatement("result.$L(java.time.LocalDateTime.parse(field$L.value().toString()))", 
-                    setter, f.number());
-            } else {
-                fromIsoMessageMethod.addStatement("result.$L(($L) field$L.value())", 
-                    setter, javaType, f.number());
-            }
-            
-            fromIsoMessageMethod.endControlFlow();
-        }
+		// Classe do encoder
+		TypeSpec encoderClass = TypeSpec.classBuilder(encoderName)
+			.addJavadoc("Encoder gerado automaticamente para $L.\nNão edite este arquivo.", meta.simpleName())
+			.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+			.addSuperinterface(ParameterizedTypeName.get(isoMessageEncoder, dto))
+			.addMethod(validateMethod.build())
+			.addMethod(isoBitSetGeneratorMethod.build())
+			.addMethod(toIsoMessageMethod.build())
+			.addMethod(encodeMethod)
+			.addMethod(encodeWithFactoryMethod)
+			.build();
 
-        fromIsoMessageMethod.addStatement("return result");
+		writeJavaFile(generatedPkg, encoderClass);
+	}
 
-        // Método decode simples
-        MethodSpec decodeSimple = MethodSpec.methodBuilder("decode")
-            .addAnnotation(Override.class)
-            .addModifiers(Modifier.PUBLIC)
-            .returns(dto)
-            .addParameter(ArrayTypeName.of(TypeName.BYTE), "data")
-            .addJavadoc("Decodifica bytes ISO 8583 em DTO")
-            .addStatement("$T decoder = new $T()", isoDecoder, isoDecoder)
-            .addStatement("$T<Integer, $T> template = createFieldTemplate()", 
-                map, fieldTemplate)
-            .addStatement("$T message = decoder.decodeWithTemplate(data, template)", isoMessage)
-            .addStatement("return fromIsoMessage(message)")
-            .build();
+	private void generateDecoder(MessageMeta meta) {
+		ClassName dto = ClassName.get(meta.packageName(), meta.simpleName());
+		String generatedPkg = meta.packageName() + ".generated";
+		String decoderName = meta.simpleName() + "Decoder";
 
-        // Método decode com factory
-        MethodSpec decodeWithFactory = MethodSpec.methodBuilder("decode")
-            .addAnnotation(Override.class)
-            .addModifiers(Modifier.PUBLIC)
-            .returns(dto)
-            .addParameter(ArrayTypeName.of(TypeName.BYTE), "data")
-            .addParameter(isoMessageFactory, "factory")
-            .addJavadoc("Decodifica bytes ISO 8583 em DTO usando factory específica")
-            .addStatement("$T message = factory.decode(data)", isoMessage)
-            .addStatement("return fromIsoMessage(message)")
-            .build();
+		// Imports necessários
+		ClassName isoMessage = ClassName.get("com.example.iso8583.domain", "IsoMessage");
+		ClassName isoValue = ClassName.get("com.example.iso8583.domain", "IsoValue");
+		ClassName fieldTemplate = ClassName.get("com.example.iso8583.domain", "FieldTemplate");
+		ClassName isoDecoder = ClassName.get("com.example.iso8583.service", "IsoDecoder");
+		ClassName isoMessageFactory = ClassName.get("com.example.iso8583.service", "IsoMessageFactory");
+		ClassName isoMessageDecoder = ClassName.get("com.example.iso8583.contract", "IsoMessageDecoder");
+		ClassName isoType = ClassName.get("com.example.iso8583.enums", "IsoType");
+		ClassName map = ClassName.get("java.util", "Map");
+		ClassName hashMap = ClassName.get("java.util", "HashMap");
 
-        // Classe do decoder
-        TypeSpec decoder = TypeSpec.classBuilder(decoderName)
-            .addJavadoc("Decoder gerado automaticamente para $L.\nNão edite este arquivo.", meta.simpleName())
-            .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            .addSuperinterface(ParameterizedTypeName.get(isoMessageDecoder, dto))
-            .addMethod(createTemplateMethod.build())
-            .addMethod(fromIsoMessageMethod.build())
-            .addMethod(decodeSimple)
-            .addMethod(decodeWithFactory)
-            .build();
+		// Metodo para criar template de campos
+		MethodSpec.Builder createTemplateMethod = MethodSpec.methodBuilder("createFieldTemplate")
+			.addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+			.returns(ParameterizedTypeName.get(map, TypeName.get(Integer.class), fieldTemplate))
+			.addJavadoc("Cria template de campos para decodificação")
+			.addStatement(
+				"$T<Integer, $T> template = new $T<>()",
+				map, fieldTemplate, hashMap
+			);
 
-        writeJavaFile(generatedPkg, decoder);
-    }
+		for (FieldMeta f : meta.fields()) {
+			createTemplateMethod.addStatement("template.put($L, new $T($T.$L, $L))",
+				f.number(), fieldTemplate, isoType, f.type().name(), f.length());
+		}
 
-    private void generateRegistry() {
-        ClassName mapClass = ClassName.get("java.util", "Map");
-        ClassName hashMapClass = ClassName.get("java.util", "HashMap");
-        ClassName encoderRegistry = ClassName.get("com.example.iso8583.contract", "EncoderRegistry");
-        ClassName isoMessageEncoder = ClassName.get("com.example.iso8583.contract", "IsoMessageEncoder");
-        ClassName isoMessageDecoder = ClassName.get("com.example.iso8583.contract", "IsoMessageDecoder");
+		createTemplateMethod.addStatement("return template");
 
-        TypeName encoderMapType = ParameterizedTypeName.get(mapClass, 
-            ClassName.get(Class.class), isoMessageEncoder);
-        TypeName decoderMapType = ParameterizedTypeName.get(mapClass, 
-            ClassName.get(Class.class), isoMessageDecoder);
+		// Metodo fromIsoMessage
+		MethodSpec.Builder fromIsoMessageMethod = MethodSpec.methodBuilder("fromIsoMessage")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.returns(dto)
+			.addParameter(isoMessage, "isoMessage")
+			.addJavadoc("Converte IsoMessage em DTO")
+			.addStatement("$T result = new $T()", dto, dto);
 
-        // Campos para mapas
-        FieldSpec encoderMapField = FieldSpec.builder(encoderMapType, "encoders", 
-            Modifier.PRIVATE, Modifier.FINAL)
-            .initializer("new $T()", hashMapClass)
-            .build();
+		// Extrai cada campo da mensagem
+		// Extrai cada campo da mensagem
+		for (FieldMeta f : meta.fields()) {
+			String propName = capitalize(f.propertyName());
+			String setter = "set" + propName;
+			// Verificar o tipo
+			String javaType = f.element().asType().toString();
 
-        FieldSpec decoderMapField = FieldSpec.builder(decoderMapType, "decoders", 
-            Modifier.PRIVATE, Modifier.FINAL)
-            .initializer("new $T()", hashMapClass)
-            .build();
+			/*
+				seguir o exemplo
+			 	IsoValue<String> field2 = (IsoValue<String>) isoMessage.getField(2);
+				if (field2 != null) {
+				  result.setPrimaryAccountNumber(field2.value());
+				}
+			 */
+			// Conversão baseada no tipo do campo no DTO
+			if (javaType.contains("BigDecimal")) {
+				fromIsoMessageMethod.addStatement(
+					"$T<java.math.BigDecimal> field$L = ($T<java.math.BigDecimal>) isoMessage.getField($L)",
+					isoValue, propName, isoValue, f.number()
+				);
 
-        // Construtor que registra todos os encoders/decoders
-        MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
-            .addModifiers(Modifier.PUBLIC);
+			} else if (javaType.contains("LocalDateTime")) {
+				fromIsoMessageMethod.addStatement(
+					"$T<java.time.LocalDateTime> field$L = ($T<java.time.LocalDateTime>) isoMessage.getField($L)",
+					isoValue, propName, isoValue, f.number()
+				);
+			} else if (javaType.contains("LocalDate")) {
+				fromIsoMessageMethod.addStatement(
+					"$T<java.time.LocalDate> field$L = ($T<java.time.LocalDate>) isoMessage.getField($L)",
+					isoValue, propName, isoValue, f.number()
+				);
+			} else if (javaType.contains("LocalTime")) {
+				fromIsoMessageMethod.addStatement(
+					"$T<java.time.LocalTime> field$L = ($T<java.time.LocalTime>) isoMessage.getField($L)",
+					isoValue, propName, isoValue, f.number()
+				);
+			} else {
+				fromIsoMessageMethod.addStatement(
+					"$T<String> field$L = ($T<String>) isoMessage.getField($L)",
+					isoValue, propName, isoValue, f.number()
+				);
+			}
 
-        for (MessageMeta messageMeta : collectedMessages) {
-            ClassName dto = ClassName.get(messageMeta.packageName(), messageMeta.simpleName());
-            ClassName encoder = ClassName.get(messageMeta.packageName() + ".generated", 
-                messageMeta.simpleName() + "Encoder");
-            ClassName decoder = ClassName.get(messageMeta.packageName() + ".generated", 
-                messageMeta.simpleName() + "Decoder");
-            
-            constructor.addStatement("encoders.put($T.class, new $T())", dto, encoder);
-            constructor.addStatement("decoders.put($T.class, new $T())", dto, decoder);
-        }
+			fromIsoMessageMethod
+				.beginControlFlow("if (field$L != null)", propName)
+				.addStatement("result.$L(field$L.value())", setter, propName)
+				.endControlFlow();
+		}
 
-        // Método getEncoder
-        MethodSpec getEncoder = MethodSpec.methodBuilder("getEncoder")
-            .addAnnotation(Override.class)
-            .addModifiers(Modifier.PUBLIC)
-            .addTypeVariable(TypeVariableName.get("T"))
-            .returns(ParameterizedTypeName.get(isoMessageEncoder, TypeVariableName.get("T")))
-            .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), 
-                TypeVariableName.get("T")), "dtoType")
-            .addStatement("$T encoder = encoders.get(dtoType)", isoMessageEncoder)
-            .beginControlFlow("if (encoder == null)")
-            .addStatement("throw new IllegalStateException(\"No encoder found for \" + dtoType.getName())")
-            .endControlFlow()
-            .addStatement("return ($T) encoder", 
-                ParameterizedTypeName.get(isoMessageEncoder, TypeVariableName.get("T")))
-            .build();
 
-        // Método getDecoder
-        MethodSpec getDecoder = MethodSpec.methodBuilder("getDecoder")
-            .addModifiers(Modifier.PUBLIC)
-            .addTypeVariable(TypeVariableName.get("T"))
-            .returns(ParameterizedTypeName.get(isoMessageDecoder, TypeVariableName.get("T")))
-            .addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), 
-                TypeVariableName.get("T")), "dtoType")
-            .addStatement("$T decoder = decoders.get(dtoType)", isoMessageDecoder)
-            .beginControlFlow("if (decoder == null)")
-            .addStatement("throw new IllegalStateException(\"No decoder found for \" + dtoType.getName())")
-            .endControlFlow()
-            .addStatement("return ($T) decoder", 
-                ParameterizedTypeName.get(isoMessageDecoder, TypeVariableName.get("T")))
-            .build();
+		fromIsoMessageMethod.addStatement("return result");
 
-        // Classe do registry
-        TypeSpec registry = TypeSpec.classBuilder("GeneratedIso8583Registry")
-            .addJavadoc("Registry gerado automaticamente.\nNão edite este arquivo.")
-            .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            .addSuperinterface(encoderRegistry)
-            .addField(encoderMapField)
-            .addField(decoderMapField)
-            .addMethod(constructor.build())
-            .addMethod(getEncoder)
-            .addMethod(getDecoder)
-            .build();
+		// Metodo decode
+		MethodSpec decodeMethod = MethodSpec.methodBuilder("decode")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.returns(dto)
+			.addParameter(String.class, "data")
+			.addJavadoc("Decodifica bytes ISO 8583 em DTO")
+			.addStatement("$T decoder = new $T()", isoDecoder, isoDecoder)
+			.addStatement("$T<Integer, $T> template = createFieldTemplate()",
+				map, fieldTemplate)
+			.addStatement("$T message = decoder.decodeWithTemplate(data, template)", isoMessage)
+			.addStatement("return fromIsoMessage(message)")
+			.build();
 
-        writeJavaFile("com.example.iso8583.generated", registry);
-    }
+		// Metodo decode com factory
+		MethodSpec decodeWithFactoryMethod = MethodSpec.methodBuilder("decode")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.returns(dto)
+			.addParameter(String.class, "data")
+			.addParameter(isoMessageFactory, "factory")
+			.addJavadoc("Decodifica bytes ISO 8583 em DTO usando factory específica")
+			.addStatement("$T message = factory.decode(data)", isoMessage)
+			.addStatement("return fromIsoMessage(message)")
+			.build();
 
-    private void writeJavaFile(String packageName, TypeSpec typeSpec) {
-        try {
-            JavaFile.builder(packageName, typeSpec)
-                .skipJavaLangImports(true)
-                .build()
-                .writeTo(filer);
-        } catch (IOException e) {
-            throw new RuntimeException("Error writing generated file", e);
-        }
-    }
+		// Classe do decoder
+		TypeSpec decoderClass = TypeSpec.classBuilder(decoderName)
+			.addJavadoc("Decoder gerado automaticamente para $L.\nNão edite este arquivo.", meta.simpleName())
+			.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+			.addSuperinterface(ParameterizedTypeName.get(isoMessageDecoder, dto))
+			.addMethod(createTemplateMethod.build())
+			.addMethod(fromIsoMessageMethod.build())
+			.addMethod(decodeMethod)
+			.addMethod(decodeWithFactoryMethod)
+			.build();
 
-    private static String capitalize(String s) {
-        if (s == null || s.isEmpty()) {
-            return s;
-        }
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
-    }
+		writeJavaFile(generatedPkg, decoderClass);
+	}
+
+	private void generateRegistry() {
+		ClassName mapClass = ClassName.get("java.util", "Map");
+		ClassName hashMapClass = ClassName.get("java.util", "HashMap");
+		ClassName iso8583Registry = ClassName.get("com.example.iso8583.contract", "Iso8583Registry");
+		ClassName isoMessageEncoder = ClassName.get("com.example.iso8583.contract", "IsoMessageEncoder");
+		ClassName isoMessageDecoder = ClassName.get("com.example.iso8583.contract", "IsoMessageDecoder");
+
+		TypeName encoderMapType = ParameterizedTypeName.get(mapClass,
+			ClassName.get(Class.class), isoMessageEncoder);
+		TypeName decoderMapType = ParameterizedTypeName.get(mapClass,
+			ClassName.get(Class.class), isoMessageDecoder);
+
+		// Campos para mapas
+		FieldSpec encoderMapField = FieldSpec.builder(encoderMapType, "encoders",
+				Modifier.PRIVATE, Modifier.FINAL)
+			.initializer("new $T()", hashMapClass)
+			.build();
+
+		FieldSpec decoderMapField = FieldSpec.builder(decoderMapType, "decoders",
+				Modifier.PRIVATE, Modifier.FINAL)
+			.initializer("new $T()", hashMapClass)
+			.build();
+
+		// Construtor que registra todos os encoders/decoders
+		MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
+			.addModifiers(Modifier.PUBLIC);
+
+		for (MessageMeta messageMeta : collectedMessages) {
+			ClassName dto = ClassName.get(messageMeta.packageName(), messageMeta.simpleName());
+			ClassName encoder = ClassName.get(messageMeta.packageName() + ".generated",
+				messageMeta.simpleName() + "Encoder");
+			ClassName decoder = ClassName.get(messageMeta.packageName() + ".generated",
+				messageMeta.simpleName() + "Decoder");
+
+			constructor.addStatement("encoders.put($T.class, new $T())", dto, encoder);
+			constructor.addStatement("decoders.put($T.class, new $T())", dto, decoder);
+		}
+
+		// Metodo getEncoder
+		MethodSpec getEncoderMethod = MethodSpec.methodBuilder("getEncoder")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.addTypeVariable(TypeVariableName.get("T"))
+			.returns(ParameterizedTypeName.get(isoMessageEncoder, TypeVariableName.get("T")))
+			.addParameter(ParameterizedTypeName.get(ClassName.get(Class.class),
+				TypeVariableName.get("T")), "dtoType")
+			.addStatement("$T encoder = encoders.get(dtoType)", isoMessageEncoder)
+			.beginControlFlow("if (encoder == null)")
+			.addStatement("throw new IllegalStateException(\"No encoder found for \" + dtoType.getName())")
+			.endControlFlow()
+			.addStatement("return ($T) encoder",
+				ParameterizedTypeName.get(isoMessageEncoder, TypeVariableName.get("T")))
+			.build();
+
+		// Metodo getDecoder
+		MethodSpec getDecoderMethod = MethodSpec.methodBuilder("getDecoder")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.addTypeVariable(TypeVariableName.get("T"))
+			.returns(ParameterizedTypeName.get(isoMessageDecoder, TypeVariableName.get("T")))
+			.addParameter(ParameterizedTypeName.get(ClassName.get(Class.class),
+				TypeVariableName.get("T")), "dtoType")
+			.addStatement("$T decoder = decoders.get(dtoType)", isoMessageDecoder)
+			.beginControlFlow("if (decoder == null)")
+			.addStatement("throw new IllegalStateException(\"No decoder found for \" + dtoType.getName())")
+			.endControlFlow()
+			.addStatement("return ($T) decoder",
+				ParameterizedTypeName.get(isoMessageDecoder, TypeVariableName.get("T")))
+			.build();
+
+		// Classe do registry
+		TypeSpec registry = TypeSpec.classBuilder("GeneratedIso8583Registry")
+			.addJavadoc("Registry gerado automaticamente.\nNão edite este arquivo.")
+			.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+			.addSuperinterface(iso8583Registry)
+			.addField(encoderMapField)
+			.addField(decoderMapField)
+			.addMethod(constructor.build())
+			.addMethod(getEncoderMethod)
+			.addMethod(getDecoderMethod)
+			.build();
+
+		writeJavaFile("com.example.iso8583.generated", registry);
+	}
+
+	private void writeJavaFile(String packageName, TypeSpec typeSpec) {
+		try {
+			JavaFile.builder(packageName, typeSpec)
+				.skipJavaLangImports(true)
+				.build()
+				.writeTo(filer);
+		} catch (IOException e) {
+			throw new RuntimeException("Error writing generated file", e);
+		}
+	}
 }

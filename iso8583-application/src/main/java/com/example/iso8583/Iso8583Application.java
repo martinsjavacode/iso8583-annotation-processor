@@ -8,7 +8,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
  * Classe principal da aplicação Spring Boot que demonstra o uso
  * de JSR 269 (Annotation Processing) para processamento automático
  * de mensagens ISO 8583.
- * 
+ * <p>
  * Esta aplicação utiliza:
  * - Java 21
  * - Spring Boot 3.5.4
@@ -20,7 +20,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableWebFlux
 public class Iso8583Application {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Iso8583Application.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(Iso8583Application.class, args);
+	}
 }

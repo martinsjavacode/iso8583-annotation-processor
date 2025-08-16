@@ -2,7 +2,8 @@
 
 ## Visão Geral
 
-Este documento descreve a migração completa de J8583 para uma implementação própria de ISO 8583, mantendo a arquitetura modular e as funcionalidades de annotation processing.
+Este documento descreve a migração completa de J8583 para uma implementação própria de ISO 8583, mantendo a arquitetura
+modular e as funcionalidades de annotation processing.
 
 ## Arquitetura Final
 
@@ -15,9 +16,11 @@ Este documento descreve a migração completa de J8583 para uma implementação 
 ### Principais Componentes
 
 #### Core (iso8583-core)
+
 - `IsoType`: Enum com todos os tipos de campo ISO 8583
 - `IsoMessage`: Representação de uma mensagem completa
-- `IsoValue`: Wrapper para valores tipados
+- `DecodeResult<T>`: Record para resultados de decodificação
+- `FieldTemplate`: Record para templates de campo
 - `IsoEncoder`: Codificador de mensagens
 - `IsoDecoder`: Decodificador de mensagens
 - `IsoMessageFactory`: Factory para criação e configuração
@@ -25,21 +28,25 @@ Este documento descreve a migração completa de J8583 para uma implementação 
 - `FieldFormatter`: Formatação de campos por tipo
 
 #### Processor (iso8583-processor)
+
 - `@Iso8583Message`: Anotação para classes de mensagem
 - `@Iso8583Field`: Anotação para campos
 - `Iso8583AnnotationProcessor`: Gerador de código
+- `Iso8583Registry`: Registry unificado para encoders/decoders
 - `IsoMessageEncoder<T>`: Interface para encoders tipados
 - `IsoMessageDecoder<T>`: Interface para decoders tipados
 
 ## Funcionalidades Implementadas
 
 ### ✅ Codificação/Decodificação
+
 - Suporte completo a todos os tipos ISO 8583
 - Bitmap primário e secundário
 - Validação de campos obrigatórios
 - Formatação automática por tipo
 
 ### ✅ Tipos Suportados
+
 - `NUMERIC`: Campos numéricos com padding zero
 - `ALPHA`: Campos alfanuméricos com padding espaço
 - `LLVAR/LLLVAR/LLLLVAR`: Campos de tamanho variável
@@ -50,12 +57,14 @@ Este documento descreve a migração completa de J8583 para uma implementação 
 - `BINARY/LLBIN/LLLBIN`: Campos binários
 
 ### ✅ Geração Automática de Código
+
 - Encoders tipados para cada DTO
 - Decoders tipados para cada DTO
 - Registry centralizado
 - Validação em tempo de compilação
 
 ### ✅ Validações
+
 - Campos obrigatórios
 - Tamanhos de campo
 - Tipos compatíveis
@@ -93,7 +102,7 @@ public class PurchaseRequestDto {
 
 ```java
 // Após compilação, o código será gerado automaticamente
-GeneratedIso8583Registry registry = new GeneratedIso8583Registry();
+Iso8583Registry registry = new GeneratedIso8583Registry();
 
 // Encoding
 IsoMessageEncoder<PurchaseRequestDto> encoder = registry.getEncoder(PurchaseRequestDto.class);
@@ -124,6 +133,7 @@ IsoMessage decoded = decoder.decode(data);
 ## Comparação: Antes vs Depois
 
 ### Antes (J8583)
+
 ```java
 // Dependência externa
 <dependency>
@@ -140,6 +150,7 @@ byte[] data = msg.writeData();
 ```
 
 ### Depois (Implementação Própria)
+
 ```java
 // Sem dependências externas
 // Código gerado automaticamente
@@ -155,26 +166,31 @@ byte[] data = encoder.encode(dto);
 ## Vantagens da Nova Implementação
 
 ### 🎯 Type Safety
+
 - Encoders/decoders tipados
 - Validação em tempo de compilação
 - Sem casting manual
 
 ### 🚀 Performance
+
 - Sem reflexão em runtime
 - Código otimizado gerado
 - Menor overhead
 
 ### 🔧 Manutenibilidade
+
 - Código próprio, totalmente controlável
 - Sem dependências externas
 - Documentação completa
 
 ### 📦 Modularidade
+
 - Separação clara de responsabilidades
 - Core reutilizável
 - Processor independente
 
 ### 🛡️ Segurança
+
 - Validações rigorosas
 - Mascaramento automático de PAN
 - Controle total sobre dados sensíveis
@@ -182,6 +198,7 @@ byte[] data = encoder.encode(dto);
 ## Testes
 
 ### Testes Unitários
+
 ```bash
 mvn test -Dtest=BitmapUtilsTest
 mvn test -Dtest=FieldFormatterTest
@@ -189,11 +206,13 @@ mvn test -Dtest=IsoMessageTest
 ```
 
 ### Testes de Integração
+
 ```bash
 mvn test -Dtest=Iso8583IntegrationTest
 ```
 
 ### Executar Todos os Testes
+
 ```bash
 mvn test
 ```
@@ -201,16 +220,19 @@ mvn test
 ## Compilação e Execução
 
 ### 1. Compilar o Projeto
+
 ```bash
 mvn clean compile
 ```
 
 ### 2. Executar a Aplicação
+
 ```bash
 mvn spring-boot:run -pl iso8583-application
 ```
 
 ### 3. Testar os Endpoints
+
 ```bash
 # Health check
 curl http://localhost:8080/api/iso8583/health
@@ -225,18 +247,21 @@ curl http://localhost:8080/api/iso8583/sample
 ## Próximos Passos
 
 ### Fase 1: ✅ Concluída
+
 - [x] Implementação core completa
 - [x] Processador de anotações
 - [x] Testes básicos
 - [x] Documentação
 
 ### Fase 2: Em Desenvolvimento
+
 - [ ] Suporte a campos binários avançados
 - [ ] Templates de mensagem pré-configurados
 - [ ] Validações customizadas
 - [ ] Métricas e logging
 
 ### Fase 3: Planejada
+
 - [ ] Suporte a múltiplos formatos de bitmap
 - [ ] Compressão de mensagens
 - [ ] Criptografia de campos sensíveis
@@ -245,12 +270,15 @@ curl http://localhost:8080/api/iso8583/sample
 ## Troubleshooting
 
 ### Problema: Código não é gerado
+
 **Solução**: Verificar se o annotation processor está configurado corretamente no classpath.
 
 ### Problema: Erro de compilação
+
 **Solução**: Limpar e recompilar: `mvn clean compile`
 
 ### Problema: Testes falhando
+
 **Solução**: Verificar se todas as dependências estão corretas no POM.
 
 ## Contribuição

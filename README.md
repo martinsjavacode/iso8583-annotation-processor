@@ -1,47 +1,59 @@
 # ISO 8583 Annotation Processor
 
-Uma implementação completa e moderna do protocolo ISO 8583 em Java, com geração automática de código através de annotation processing (JSR 269).
+Uma implementação completa e moderna do protocolo ISO 8583 em Java, com geração automática de código através de
+annotation processing (JSR 269).
 
 ## 🚀 Características Principais
 
 - **Type Safety**: Encoders e decoders completamente tipados
-- **Zero Dependencies**: Implementação própria, sem dependências externas
+- **Zero Dependencies**: Implementação própria, sem dependências externas no core
 - **Annotation-Driven**: Configuração através de anotações simples
 - **Code Generation**: Geração automática de código em tempo de compilação
 - **Modular Architecture**: Separação clara entre core, processor e application
 - **High Performance**: Sem reflexão em runtime, código otimizado
-- **Comprehensive Testing**: Testes unitários e de integração completos
+- **Modern Java**: Utiliza Java 21 com records e features modernas
+- **Spring Boot Integration**: Integração nativa com Spring Boot 3.5.4
 
 ## 📦 Módulos
 
 ### iso8583-core
+
 Implementação base do protocolo ISO 8583:
+
 - Tipos de campo completos (NUMERIC, ALPHA, LLVAR, DATE, AMOUNT, etc.)
 - Manipulação de bitmap primário e secundário
 - Encoders e decoders de baixo nível
 - Utilitários para formatação e validação
+- Records modernos: `DecodeResult<T>` e `FieldTemplate`
 
 ### iso8583-processor
+
 Processador de anotações JSR 269:
+
 - `@Iso8583Message`: Marca classes como mensagens ISO 8583
 - `@Iso8583Field`: Configura campos individuais
 - Geração automática de encoders/decoders tipados
 - Validação em tempo de compilação
+- Registry unificado: `Iso8583Registry`
 
 ### iso8583-application
+
 Aplicação Spring Boot de exemplo:
+
 - Demonstração de uso completo
 - REST API para testes
-- Integração com Spring Boot
-- Exemplos práticos
+- Integração com Spring Boot 3.5.4
+- Exemplos práticos com `PurchaseRequestDto`
 
 ## 🛠️ Instalação
 
 ### Pré-requisitos
+
 - Java 21+
 - Maven 3.8+
 
 ### Compilação
+
 ```bash
 git clone <repository-url>
 cd iso8583-annotation-processor
@@ -49,11 +61,13 @@ mvn clean compile
 ```
 
 ### Execução dos Testes
+
 ```bash
 mvn test
 ```
 
 ### Executar Aplicação
+
 ```bash
 mvn spring-boot:run -pl iso8583-application
 ```
@@ -90,7 +104,7 @@ public class PurchaseRequestDto {
 
 ```java
 // Após compilação, o código é gerado automaticamente
-GeneratedIso8583Registry registry = new GeneratedIso8583Registry();
+Iso8583Registry registry = new GeneratedIso8583Registry();
 
 // Encoding
 IsoMessageEncoder<PurchaseRequestDto> encoder = registry.getEncoder(PurchaseRequestDto.class);
@@ -103,88 +117,103 @@ PurchaseRequestDto decoded = decoder.decode(isoData);
 
 ## 🎯 Tipos de Campo Suportados
 
-| Tipo | Descrição | Exemplo |
-|------|-----------|---------|
-| `NUMERIC` | Numérico com padding zero | `000123` |
-| `ALPHA` | Alfanumérico com padding espaço | `ABC   ` |
-| `LLVAR` | Variável com 2 dígitos de tamanho | `05HELLO` |
-| `LLLVAR` | Variável com 3 dígitos de tamanho | `011HELLO WORLD` |
-| `DATE14` | Data YYYYMMDDHHMMSS | `20240814153045` |
-| `DATE10` | Data MMDDHHMMSS | `0814153045` |
-| `TIME` | Hora HHMMSS | `153045` |
-| `AMOUNT` | Valor monetário (12 dígitos) | `000000012345` |
-| `BINARY` | Campo binário | Bytes raw |
+| Tipo      | Descrição                         | Exemplo          |
+|-----------|-----------------------------------|------------------|
+| `NUMERIC` | Numérico com padding zero         | `000123`         |
+| `ALPHA`   | Alfanumérico com padding espaço   | `ABC   `         |
+| `LLVAR`   | Variável com 2 dígitos de tamanho | `05HELLO`        |
+| `LLLVAR`  | Variável com 3 dígitos de tamanho | `011HELLO WORLD` |
+| `DATE14`  | Data YYYYMMDDHHMMSS               | `20240814153045` |
+| `DATE10`  | Data MMDDHHMMSS                   | `0814153045`     |
+| `TIME`    | Hora HHMMSS                       | `153045`         |
+| `AMOUNT`  | Valor monetário (12 dígitos)      | `000000012345`   |
+| `BINARY`  | Campo binário                     | Bytes raw        |
 
 ## 🔧 API REST (Aplicação de Exemplo)
 
 ### Endpoints Disponíveis
 
 ```bash
-# Health check
-GET /api/iso8583/health
+# Codificar mensagem
+POST /iso8583/encoder
+Content-Type: application/json
 
-# Informações da implementação
-GET /api/iso8583/info
+{
+  "primaryAccountNumber": "1234567890123456",
+  "transactionAmount": 100.50
+}
 
-# Criar exemplo de DTO
-GET /api/iso8583/sample
+# Decodificar mensagem
+POST /iso8583/decoder
+Content-Type: application/json
 
-# Codificar mensagem (após geração de código)
-POST /api/iso8583/encode
-
-# Decodificar mensagem (após geração de código)
-POST /api/iso8583/decode
+"<mensagem_iso8583_em_string>"
 ```
 
-### Exemplo de Resposta
+### Exemplo de Uso com cURL
 
-```json
-{
-  "implementation": "Custom ISO 8583 Implementation",
-  "version": "1.0.0-SNAPSHOT",
-  "status": "Code generation pending",
-  "supportedTypes": [
-    "NUMERIC", "ALPHA", "LLVAR", "LLLVAR", 
-    "DATE14", "DATE10", "TIME", "AMOUNT"
-  ]
-}
+```bash
+# Codificar uma mensagem
+curl -X POST http://localhost:8080/iso8583/encoder \
+  -H "Content-Type: application/json" \
+  -d '{
+    "primaryAccountNumber": "1234567890123456",
+    "transactionAmount": 100.50
+  }'
+
+# Decodificar uma mensagem
+curl -X POST http://localhost:8080/iso8583/decoder \
+  -H "Content-Type: application/json" \
+  -d '"<mensagem_codificada>"'
 ```
 
 ## 🧪 Testes
 
 ### Executar Todos os Testes
+
 ```bash
 mvn test
 ```
 
 ### Testes Específicos
+
 ```bash
 # Testes do core
-mvn test -Dtest=BitmapUtilsTest
-mvn test -Dtest=FieldFormatterTest
-mvn test -Dtest=IsoMessageTest
+mvn test -pl iso8583-core
 
-# Testes de integração
-mvn test -Dtest=Iso8583IntegrationTest
+# Testes do processor
+mvn test -pl iso8583-processor
+
+# Testes da aplicação
+mvn test -pl iso8583-application
 ```
+
+### Cobertura de Testes
+
+O projeto mantém alta cobertura de testes com foco em:
+
+- Validação de tipos de campo
+- Encoding/decoding de mensagens
+- Geração de código
+- Integração entre módulos
 
 ## 📊 Arquitetura
 
 ```
 iso8583-annotation-processor/
 ├── iso8583-core/           # Implementação base
-│   ├── domain/            # IsoMessage, IsoValue
+│   ├── domain/            # DecodeResult, FieldTemplate, IsoMessage
 │   ├── enums/             # IsoType
-│   ├── service/           # Encoder, Decoder, Factory
+│   ├── service/           # IsoEncoder, IsoDecoder, IsoMessageFactory
 │   └── utils/             # BitmapUtils, FieldFormatter
 ├── iso8583-processor/      # Annotation Processor
 │   ├── annotation/        # @Iso8583Message, @Iso8583Field
-│   ├── contract/          # Interfaces geradas
-│   └── processor/         # Gerador de código
+│   ├── contract/          # Iso8583Registry, IsoMessageEncoder/Decoder
+│   └── processor/         # Gerador de código JSR 269
 └── iso8583-application/    # Aplicação exemplo
     ├── dto/               # DTOs anotados
-    ├── service/           # Lógica de negócio
-    └── controller/        # REST endpoints
+    ├── controller/        # REST endpoints
+    └── generated/         # Código gerado automaticamente
 ```
 
 ## 🔄 Fluxo de Processamento
@@ -197,12 +226,14 @@ iso8583-annotation-processor/
 ## 📈 Performance
 
 ### Vantagens sobre J8583
+
 - ✅ **Sem reflexão**: Código gerado é direto
 - ✅ **Type safety**: Erros detectados em compilação
 - ✅ **Menor overhead**: Sem parsing dinâmico
 - ✅ **Melhor debugging**: Código gerado é legível
 
 ### Benchmarks (estimados)
+
 - **Encoding**: ~50% mais rápido
 - **Decoding**: ~40% mais rápido
 - **Memory usage**: ~30% menor
@@ -210,6 +241,7 @@ iso8583-annotation-processor/
 ## 🛡️ Segurança
 
 ### Recursos de Segurança
+
 - **PAN Masking**: Mascaramento automático em logs
 - **Field Validation**: Validação rigorosa de tipos e tamanhos
 - **No External Dependencies**: Controle total sobre o código
@@ -230,6 +262,7 @@ iso8583-annotation-processor/
 5. Abra um Pull Request
 
 ### Diretrizes
+
 - Mantenha cobertura de testes > 80%
 - Siga as convenções de código existentes
 - Adicione documentação para novas funcionalidades
@@ -238,18 +271,21 @@ iso8583-annotation-processor/
 ## 📋 Roadmap
 
 ### v1.1.0 (Próxima Release)
+
 - [ ] Suporte a campos binários avançados
 - [ ] Templates de mensagem pré-configurados
 - [ ] Validações customizadas via anotações
 - [ ] Métricas de performance
 
 ### v1.2.0 (Futuro)
+
 - [ ] Suporte a múltiplos formatos de bitmap
 - [ ] Compressão de mensagens
 - [ ] Criptografia de campos sensíveis
 - [ ] Dashboard de monitoramento
 
 ### v2.0.0 (Longo Prazo)
+
 - [ ] Suporte a ISO 8583:2003
 - [ ] Plugin Maven para geração de código
 - [ ] Integração com Spring Boot Starter

@@ -1,6 +1,6 @@
 package com.example.iso8583.generated;
 
-import com.example.iso8583.contract.EncoderRegistry;
+import com.example.iso8583.contract.Iso8583Registry;
 import com.example.iso8583.contract.IsoMessageDecoder;
 import com.example.iso8583.contract.IsoMessageEncoder;
 import com.example.iso8583.dto.PurchaseRequestDto;
@@ -13,7 +13,7 @@ import java.util.Map;
  * Registry gerado automaticamente.
  * Não edite este arquivo.
  */
-public final class GeneratedIso8583Registry implements EncoderRegistry {
+public final class GeneratedIso8583Registry implements Iso8583Registry {
   private final Map<Class, IsoMessageEncoder> encoders = new HashMap();
 
   private final Map<Class, IsoMessageDecoder> decoders = new HashMap();
@@ -32,6 +32,7 @@ public final class GeneratedIso8583Registry implements EncoderRegistry {
     return (IsoMessageEncoder<T>) encoder;
   }
 
+  @Override
   public <T> IsoMessageDecoder<T> getDecoder(Class<T> dtoType) {
     IsoMessageDecoder decoder = decoders.get(dtoType);
     if (decoder == null) {

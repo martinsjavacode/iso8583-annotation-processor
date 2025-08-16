@@ -13,11 +13,11 @@ import javax.lang.model.element.VariableElement;
  * @param propertyName ex: "pan" -> usado para gerar getPan()
  */
 public record FieldMeta(
-		VariableElement element,
-		int number,
-		IsoType type,
-		int length,
-		boolean required,
-		String propertyName
+	VariableElement element,
+	int number,
+	IsoType type,
+	int length,
+	boolean required,
+	String propertyName
 ) {
 }

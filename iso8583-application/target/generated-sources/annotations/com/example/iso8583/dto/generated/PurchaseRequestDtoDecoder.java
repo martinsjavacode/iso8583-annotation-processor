@@ -1,6 +1,7 @@
 package com.example.iso8583.dto.generated;
 
 import com.example.iso8583.contract.IsoMessageDecoder;
+import com.example.iso8583.domain.FieldTemplate;
 import com.example.iso8583.domain.IsoMessage;
 import com.example.iso8583.domain.IsoValue;
 import com.example.iso8583.dto.PurchaseRequestDto;
@@ -18,23 +19,23 @@ public final class PurchaseRequestDtoDecoder implements IsoMessageDecoder<Purcha
   /**
    * Cria template de campos para decodificação
    */
-  private static Map<Integer, IsoDecoder.FieldTemplate> createFieldTemplate() {
-    Map<Integer, IsoDecoder.FieldTemplate> template = new HashMap<>();
-    template.put(2, new IsoDecoder.FieldTemplate(IsoType.LLVAR, 0));
-    template.put(3, new IsoDecoder.FieldTemplate(IsoType.NUMERIC, 6));
-    template.put(4, new IsoDecoder.FieldTemplate(IsoType.AMOUNT, 12));
-    template.put(7, new IsoDecoder.FieldTemplate(IsoType.DATE10, 10));
-    template.put(11, new IsoDecoder.FieldTemplate(IsoType.NUMERIC, 6));
-    template.put(12, new IsoDecoder.FieldTemplate(IsoType.TIME, 6));
-    template.put(13, new IsoDecoder.FieldTemplate(IsoType.DATE4, 4));
-    template.put(18, new IsoDecoder.FieldTemplate(IsoType.NUMERIC, 4));
-    template.put(22, new IsoDecoder.FieldTemplate(IsoType.NUMERIC, 3));
-    template.put(25, new IsoDecoder.FieldTemplate(IsoType.NUMERIC, 2));
-    template.put(32, new IsoDecoder.FieldTemplate(IsoType.LLVAR, 0));
-    template.put(37, new IsoDecoder.FieldTemplate(IsoType.ALPHA, 12));
-    template.put(41, new IsoDecoder.FieldTemplate(IsoType.ALPHA, 8));
-    template.put(42, new IsoDecoder.FieldTemplate(IsoType.ALPHA, 15));
-    template.put(49, new IsoDecoder.FieldTemplate(IsoType.NUMERIC, 3));
+  private static Map<Integer, FieldTemplate> createFieldTemplate() {
+    Map<Integer, FieldTemplate> template = new HashMap<>();
+    template.put(2, new FieldTemplate(IsoType.LLVAR, 0));
+    template.put(3, new FieldTemplate(IsoType.NUMERIC, 6));
+    template.put(4, new FieldTemplate(IsoType.AMOUNT, 12));
+    template.put(7, new FieldTemplate(IsoType.DATE10, 10));
+    template.put(11, new FieldTemplate(IsoType.NUMERIC, 6));
+    template.put(12, new FieldTemplate(IsoType.TIME, 6));
+    template.put(13, new FieldTemplate(IsoType.DATE4, 4));
+    template.put(18, new FieldTemplate(IsoType.NUMERIC, 4));
+    template.put(22, new FieldTemplate(IsoType.NUMERIC, 3));
+    template.put(25, new FieldTemplate(IsoType.NUMERIC, 2));
+    template.put(32, new FieldTemplate(IsoType.LLVAR, 0));
+    template.put(37, new FieldTemplate(IsoType.ALPHA, 12));
+    template.put(41, new FieldTemplate(IsoType.ALPHA, 8));
+    template.put(42, new FieldTemplate(IsoType.ALPHA, 15));
+    template.put(49, new FieldTemplate(IsoType.NUMERIC, 3));
     return template;
   }
 
@@ -44,65 +45,65 @@ public final class PurchaseRequestDtoDecoder implements IsoMessageDecoder<Purcha
   @Override
   public PurchaseRequestDto fromIsoMessage(IsoMessage isoMessage) {
     PurchaseRequestDto result = new PurchaseRequestDto();
-    IsoValue<?> field2 = isoMessage.getField(2);
-    if (field2 != null) {
-      result.setPrimaryAccountNumber(field2.value().toString());
+    IsoValue<String> fieldPrimaryAccountNumber = (IsoValue<String>) isoMessage.getField(2);
+    if (fieldPrimaryAccountNumber != null) {
+      result.setPrimaryAccountNumber(fieldPrimaryAccountNumber.value());
     }
-    IsoValue<?> field3 = isoMessage.getField(3);
-    if (field3 != null) {
-      result.setProcessingCode(field3.value().toString());
+    IsoValue<String> fieldProcessingCode = (IsoValue<String>) isoMessage.getField(3);
+    if (fieldProcessingCode != null) {
+      result.setProcessingCode(fieldProcessingCode.value());
     }
-    IsoValue<?> field4 = isoMessage.getField(4);
-    if (field4 != null) {
-      result.setTransactionAmount(new java.math.BigDecimal(field4.value().toString()));
+    IsoValue<java.math.BigDecimal> fieldTransactionAmount = (IsoValue<java.math.BigDecimal>) isoMessage.getField(4);
+    if (fieldTransactionAmount != null) {
+      result.setTransactionAmount(fieldTransactionAmount.value());
     }
-    IsoValue<?> field7 = isoMessage.getField(7);
-    if (field7 != null) {
-      result.setTransmissionDateTime(java.time.LocalDateTime.parse(field7.value().toString()));
+    IsoValue<java.time.LocalDateTime> fieldTransmissionDateTime = (IsoValue<java.time.LocalDateTime>) isoMessage.getField(7);
+    if (fieldTransmissionDateTime != null) {
+      result.setTransmissionDateTime(fieldTransmissionDateTime.value());
     }
-    IsoValue<?> field11 = isoMessage.getField(11);
-    if (field11 != null) {
-      result.setSystemTraceAuditNumber(field11.value().toString());
+    IsoValue<String> fieldSystemTraceAuditNumber = (IsoValue<String>) isoMessage.getField(11);
+    if (fieldSystemTraceAuditNumber != null) {
+      result.setSystemTraceAuditNumber(fieldSystemTraceAuditNumber.value());
     }
-    IsoValue<?> field12 = isoMessage.getField(12);
-    if (field12 != null) {
-      result.setLocalTransactionTime(java.time.LocalDateTime.parse(field12.value().toString()));
+    IsoValue<java.time.LocalTime> fieldLocalTransactionTime = (IsoValue<java.time.LocalTime>) isoMessage.getField(12);
+    if (fieldLocalTransactionTime != null) {
+      result.setLocalTransactionTime(fieldLocalTransactionTime.value());
     }
-    IsoValue<?> field13 = isoMessage.getField(13);
-    if (field13 != null) {
-      result.setLocalTransactionDate(java.time.LocalDateTime.parse(field13.value().toString()));
+    IsoValue<java.time.LocalDate> fieldLocalTransactionDate = (IsoValue<java.time.LocalDate>) isoMessage.getField(13);
+    if (fieldLocalTransactionDate != null) {
+      result.setLocalTransactionDate(fieldLocalTransactionDate.value());
     }
-    IsoValue<?> field18 = isoMessage.getField(18);
-    if (field18 != null) {
-      result.setMerchantCategoryCode(field18.value().toString());
+    IsoValue<String> fieldMerchantCategoryCode = (IsoValue<String>) isoMessage.getField(18);
+    if (fieldMerchantCategoryCode != null) {
+      result.setMerchantCategoryCode(fieldMerchantCategoryCode.value());
     }
-    IsoValue<?> field22 = isoMessage.getField(22);
-    if (field22 != null) {
-      result.setPosEntryMode(field22.value().toString());
+    IsoValue<String> fieldPosEntryMode = (IsoValue<String>) isoMessage.getField(22);
+    if (fieldPosEntryMode != null) {
+      result.setPosEntryMode(fieldPosEntryMode.value());
     }
-    IsoValue<?> field25 = isoMessage.getField(25);
-    if (field25 != null) {
-      result.setPosConditionCode(field25.value().toString());
+    IsoValue<String> fieldPosConditionCode = (IsoValue<String>) isoMessage.getField(25);
+    if (fieldPosConditionCode != null) {
+      result.setPosConditionCode(fieldPosConditionCode.value());
     }
-    IsoValue<?> field32 = isoMessage.getField(32);
-    if (field32 != null) {
-      result.setAcquiringInstitutionId(field32.value().toString());
+    IsoValue<String> fieldAcquiringInstitutionId = (IsoValue<String>) isoMessage.getField(32);
+    if (fieldAcquiringInstitutionId != null) {
+      result.setAcquiringInstitutionId(fieldAcquiringInstitutionId.value());
     }
-    IsoValue<?> field37 = isoMessage.getField(37);
-    if (field37 != null) {
-      result.setRetrievalReferenceNumber(field37.value().toString());
+    IsoValue<String> fieldRetrievalReferenceNumber = (IsoValue<String>) isoMessage.getField(37);
+    if (fieldRetrievalReferenceNumber != null) {
+      result.setRetrievalReferenceNumber(fieldRetrievalReferenceNumber.value());
     }
-    IsoValue<?> field41 = isoMessage.getField(41);
-    if (field41 != null) {
-      result.setTerminalId(field41.value().toString());
+    IsoValue<String> fieldTerminalId = (IsoValue<String>) isoMessage.getField(41);
+    if (fieldTerminalId != null) {
+      result.setTerminalId(fieldTerminalId.value());
     }
-    IsoValue<?> field42 = isoMessage.getField(42);
-    if (field42 != null) {
-      result.setMerchantId(field42.value().toString());
+    IsoValue<String> fieldMerchantId = (IsoValue<String>) isoMessage.getField(42);
+    if (fieldMerchantId != null) {
+      result.setMerchantId(fieldMerchantId.value());
     }
-    IsoValue<?> field49 = isoMessage.getField(49);
-    if (field49 != null) {
-      result.setCurrencyCode(field49.value().toString());
+    IsoValue<String> fieldCurrencyCode = (IsoValue<String>) isoMessage.getField(49);
+    if (fieldCurrencyCode != null) {
+      result.setCurrencyCode(fieldCurrencyCode.value());
     }
     return result;
   }
@@ -111,9 +112,9 @@ public final class PurchaseRequestDtoDecoder implements IsoMessageDecoder<Purcha
    * Decodifica bytes ISO 8583 em DTO
    */
   @Override
-  public PurchaseRequestDto decode(byte[] data) {
+  public PurchaseRequestDto decode(String data) {
     IsoDecoder decoder = new IsoDecoder();
-    Map<Integer, IsoDecoder.FieldTemplate> template = createFieldTemplate();
+    Map<Integer, FieldTemplate> template = createFieldTemplate();
     IsoMessage message = decoder.decodeWithTemplate(data, template);
     return fromIsoMessage(message);
   }
@@ -122,7 +123,7 @@ public final class PurchaseRequestDtoDecoder implements IsoMessageDecoder<Purcha
    * Decodifica bytes ISO 8583 em DTO usando factory específica
    */
   @Override
-  public PurchaseRequestDto decode(byte[] data, IsoMessageFactory factory) {
+  public PurchaseRequestDto decode(String data, IsoMessageFactory factory) {
     IsoMessage message = factory.decode(data);
     return fromIsoMessage(message);
   }
