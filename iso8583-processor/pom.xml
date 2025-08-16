@@ -1,0 +1,72 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.example</groupId>
+        <artifactId>iso8583-annotation-processor</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>iso8583-processor</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <javapoet.version>0.7.0</javapoet.version>
+        <auto.service.version>1.1.1</auto.service.version>
+    </properties>
+
+    <dependencies>
+        <!-- Dependência do nosso módulo core -->
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>iso8583-core</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Annotation Processor API -->
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>${auto.service.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.palantir.javapoet</groupId>
+            <artifactId>javapoet</artifactId>
+            <version>${javapoet.version}</version>
+        </dependency>
+
+        <!-- JUnit 5 para testes -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.auto.service</groupId>
+                            <artifactId>auto-service</artifactId>
+                            <version>${auto.service.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

@@ -1,27 +1,34 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
     <artifactId>iso8583-annotation-processor</artifactId>
-    <version>1.0.0</version>
-    <packaging>jar</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>iso8583-core</module>
+        <module>iso8583-processor</module>
+        <module>iso8583-application</module>
+    </modules>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.plugin.version>3.14.0</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
         <spring.boot.version>3.5.4</spring.boot.version>
-        <j8583.version>3.0.0</j8583.version>
-        <javapoet.version>1.13.0</javapoet.version>
-        <auto.service.version>1.1.1</auto.service.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Spring Boot BOM -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -32,233 +39,26 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <!-- Spring Boot WebFlux -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
-
-        <!-- J8583 para manipulação ISO 8583 -->
-        <dependency>
-            <groupId>net.sf.j8583</groupId>
-            <artifactId>j8583</artifactId>
-            <version>${j8583.version}</version>
-        </dependency>
-
-        <!-- Annotation Processing -->
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-            <version>${auto.service.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- JavaPoet para geração de código -->
-        <dependency>
-            <groupId>com.squareup</groupId>
-            <artifactId>javapoet</artifactId>
-            <version>${javapoet.version}</version>
-        </dependency>
-
-        <!-- Testes -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <build>
-        <plugins>
-            <!-- Spring Boot Plugin -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring.boot.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            
-            <!-- Maven Compiler Plugin - CONFIGURAÇÃO OTIMIZADA PARA JSR 269 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                    <encoding>UTF-8</encoding>
-                    
-                    <!-- Configurações específicas para JSR 269 -->
-                    <compilerArgs>
-                        <arg>-Xlint:unchecked</arg>
-                        <arg>-Xlint:deprecation</arg>
-                    </compilerArgs>
-                </configuration>
-                <executions>
-                    <!-- Primeira fase: compilar annotation processor -->
-                    <execution>
-                        <id>compile-processor</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <includes>
-                                <include>**/annotation/**</include>
-                                <include>**/processor/**</include>
-                            </includes>
-                            <compilerArgs>
-                                <arg>-proc:none</arg>
-                            </compilerArgs>
-                        </configuration>
-                    </execution>
-                    <!-- Segunda fase: processar anotações nos DTOs -->
-                    <execution>
-                        <id>process-annotations</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <includes>
-                                <include>**/dto/**</include>
-                            </includes>
-                            <compilerArgs>
-                                <arg>-proc:only</arg>
-                                <arg>-s</arg>
-                                <arg>${project.build.directory}/generated-sources/annotations</arg>
-                            </compilerArgs>
-                        </configuration>
-                    </execution>
-                    <!-- Terceira fase: compilar tudo -->
-                    <execution>
-                        <id>default-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <compilerArgs>
-                                <arg>-proc:none</arg>
-                            </compilerArgs>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Build Helper Plugin - Adiciona sources geradas ao classpath -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.4.0</version>
-                <executions>
-                    <execution>
-                        <id>add-generated-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-sources/annotations</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Surefire Plugin para testes -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
-                <configuration>
-                    <includes>
-                        <include>**/*Test.java</include>
-                        <include>**/*Tests.java</include>
-                    </includes>
-                    <!-- Garante que as classes geradas estejam no classpath dos testes -->
-                    <additionalClasspathElements>
-                        <additionalClasspathElement>${project.build.directory}/generated-sources/annotations</additionalClasspathElement>
-                    </additionalClasspathElements>
-                </configuration>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
-    <!-- Profiles para diferentes cenários de compilação -->
-    <profiles>
-        <!-- Profile para desenvolvimento - compilação manual em fases -->
-        <profile>
-            <id>dev</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <!-- Desabilita processamento automático para controle manual -->
-                            <proc>none</proc>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- Profile para debug do annotation processing -->
-        <profile>
-            <id>debug-annotation-processing</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <compilerArgs>
-                                <arg>-Averbose=true</arg>
-                                <arg>-Adebug=true</arg>
-                                <arg>-XprintProcessorInfo</arg>
-                                <arg>-XprintRounds</arg>
-                            </compilerArgs>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- Profile para validação ISO 8583 -->
-        <profile>
-            <id>validate-iso8583</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <includes>
-                                <include>**/*Iso8583*Test.java</include>
-                                <include>**/*EncodeDecodeTest.java</include>
-                            </includes>
-                            <systemPropertyVariables>
-                                <iso8583.validation.enabled>true</iso8583.validation.enabled>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

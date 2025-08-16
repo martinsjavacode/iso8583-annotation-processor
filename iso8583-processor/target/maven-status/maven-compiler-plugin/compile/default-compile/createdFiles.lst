@@ -1,0 +1,9 @@
+com/example/iso8583/contract/IsoMessageDecoder.class
+com/example/iso8583/contract/Iso8583Registry.class
+com/example/iso8583/annotation/Iso8583Field.class
+com/example/iso8583/processor/meta/MessageMeta.class
+com/example/iso8583/contract/IsoMessageEncoder.class
+com/example/iso8583/processor/Iso8583AnnotationProcessor.class
+com/example/iso8583/annotation/Iso8583Message.class
+META-INF/services/javax.annotation.processing.Processor
+com/example/iso8583/processor/meta/FieldMeta.class
